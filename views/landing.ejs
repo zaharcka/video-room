@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Chat - Create or Join Room</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0f0f0; }
+        .container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; }
+        h1 { margin-bottom: 20px; }
+        .action-button { background-color: #007bff; color: white; border: none; padding: 10px 20px; margin: 10px 0; border-radius: 5px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-block; }
+        .action-button:hover { background-color: #0056b3; }
+        .join-form { margin-top: 20px; }
+        .join-form input[type="text"] { padding: 10px; border-radius: 5px; border: 1px solid #ccc; margin-right: 10px; font-size: 16px; }
+        .join-form button { padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .join-form button:hover { background-color: #1e7e34; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Video Chat</h1>
+        <button class="action-button" onclick="createNewRoom()">Create a New Room</button>
+        <div class="join-form">
+            <input type="text" id="roomIdInput" placeholder="Enter Room ID">
+            <button onclick="joinExistingRoom()">Join Room</button>
+        </div>
+    </div>
+
+    <script>
+        function createNewRoom() {
+            const newRoomId = uuid.v4();
+            window.location.href = '/room/' + newRoomId;
+        }
+
+        function joinExistingRoom() {
+            const roomId = document.getElementById('roomIdInput').value;
+            if (roomId && roomId.trim() !== '') {
+                window.location.href = '/room/' + roomId;
+            } else {
+                alert("Please enter a Room ID.");
+            }
+        }
+    </script>
+</body>
+</html>

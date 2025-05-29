@@ -100,3 +100,10 @@ video {
     justify-content: center;
     flex-wrap: wrap;
 }
+
+.options__button.control-disabled {
+    background-color: #cc3030; /* Example: red background when disabled */
+}
+.options__button.control-disabled i {
+    color: #fff; /* Example: white icon when button is red */
+}
