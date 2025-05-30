@@ -1,0 +1,60 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint code (optional)
+        run: npx eslint . --fix
+
+      - name: Run tests (placeholder)
+        run: echo "No tests configured yet."
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            set -e 
+            APP_DIR=${{ secrets.DEPLOY_PATH || '/var/www/videochat' }}
+            APP_NAME=${{ secrets.APP_NAME || 'videochat' }}
+            
+            echo "Navigating to or creating application directory $APP_DIR"
+            mkdir -p $APP_DIR
+            cd $APP_DIR
+            
+            echo "Deploying application files from $GITHUB_WORKSPACE to $APP_DIR on server"
+            # Use rsync to copy files, excluding .git, node_modules, and .idea
+            # The source directory $GITHUB_WORKSPACE/ will have its contents copied into $APP_DIR
+            rsync -avz --delete --exclude '.git*' --exclude 'node_modules' --exclude '.idea' --exclude '.github' $GITHUB_WORKSPACE/ $APP_DIR/
+            
+            echo "Installing/updating production dependencies"
+            npm install --omit=dev
+            
+            echo "Restarting application $APP_NAME"
+            # Check if the app is running with pm2, otherwise start it
+            pm2 describe $APP_NAME > /dev/null
+            if [ $? -eq 0 ]; then
+              pm2 restart $APP_NAME
+            else
+              pm2 start server.js --name $APP_NAME
+            fi
+            echo "Deployment successful"
