@@ -2,12 +2,13 @@ const express = require("express");
 const app = express();
 const server = require('http').Server(app);
 
-const { Server } = require('socket.io');
-const io = require('socket.io')(server);
+const { Server: ServerIo } = require('socket.io');
+const io = new ServerIo(server);
 
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server, {
     debug: true,
+    port: 5000,
 
 });
 app.set('view engine', 'ejs');
@@ -33,4 +34,6 @@ io.on("connection", (socket) => {
     })
 });
 
-server.listen(3030);
+server.listen(3030, () => {
+    console.log('Server started');
+});
